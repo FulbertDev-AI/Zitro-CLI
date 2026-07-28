@@ -1,0 +1,25 @@
+[package]
+name = "zitro-cli"
+version = "1.0.0"
+edition = "2021"
+description = "Auditeur d'empreinte carbone numerique pour applications web"
+license = "MIT"
+repository = "https://github.com/FulbertDev-AI/Zitro-CLI.git"
+authors = ["Fulbert D. NANGA <fulbertnanga1@gmail.com>"]
+
+[[bin]]
+name = "zitro"
+path = "src/main.rs"
+
+[dependencies]
+clap = { version = "4.4", features = ["derive"] }
+reqwest = { version = "0.11", features = ["json"] }
+tokio = { version = "1", features = ["full"] }
+scraper = "0.18"
+colored = "2.0"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+anyhow = "1.0"
+regex = "1.10"
+url = "2.5"
+chrono = "0.4"
