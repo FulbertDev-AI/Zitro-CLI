@@ -67,8 +67,9 @@ impl Grade {
         match self {
             Grade::A => "EXCELLENT - Empreinte minimale",
             Grade::B => "BON - Quelques optimisations possibles",
-            Grade::C => "MOYEN - Impact notable",
-            Grade::D => "MEDIOCRE - Forte empreinte carbone",
+            Grade::C => "MOYEN - Impact moyen
+            ",
+            Grade::D => "MOYEN - Impact moyen",
             Grade::E => "MAUVAIS - Impact environnemental critique",
             Grade::F => "CRITIQUE - Catastrophe ecologique numerique",
         }
@@ -76,10 +77,10 @@ impl Grade {
 
     pub fn production_message(&self) -> (&str, bool) {
         match self {
-            Grade::A => ("Autorise pour la production.", true),
-            Grade::B => ("Autorise pour la production.", true),
-            Grade::C => ("Optimisez avant la mise en production.", false),
-            Grade::D => ("Deconseille sans refonte.", false),
+            Grade::A => ("Autorise pour la mise en production.", true),
+            Grade::B => ("Autorise pour la mise en  production.", true),
+            Grade::C => ("Optimisez avant la mise en production.", true),
+            Grade::D => ("Optimisez avant la mise en production.", true),
             Grade::E => ("Interdiction de deploiement.", false),
             Grade::F => ("Refonte totale requise.", false),
         }

@@ -1,0 +1,42 @@
+============================================================
+        RAPPORT D'AUDIT ZITRO CLI
+============================================================
+
+Date : 2026-07-29 01:07:30
+URL auditee : https://estabat.org/
+Mix energetique : 400 gCO2eq/kWh
+Pays cible : TG
+
+--- METRIQUES ---
+Poids total : 4007.30 Ko
+Nombre de requetes : 56
+Taille du DOM : 894 noeuds
+Carbone estime : 1.602920 g CO2eq
+
+--- SCORE ECOINDEX ---
+Score : 35.76 / 100
+Note : D
+Appreciation : MEDIOCRE - Forte empreinte carbone
+
+--- DECISION DE MISE EN PRODUCTION ---
+Statut : DECONSEILLE
+Message : Deconseille sans refonte.
+
+--- RESSOURCES LES PLUS IMPACTANTES ---
+1. https://estabat.org/public/assets/img/etudiants-diplomes.png (485.08 Ko) - Image
+   -> Action recommandee : Convertir en format WebP/AVIF, redimensionner et compresser.
+
+2. https://www.googletagmanager.com/gtag/js?id=G-4N8M3X7PTH (477.81 Ko) - Autre
+   -> Action recommandee : Verifier la necessite de cette ressource.
+
+3. https://estabat.org/public/assets/img/news2.png (308.69 Ko) - Image
+   -> Action recommandee : Convertir en format WebP/AVIF, redimensionner et compresser.
+
+4. https://estabat.org/public/assets/img/news1.png (297.84 Ko) - Image
+   -> Action recommandee : Optimiser la compression et utiliser le lazy loading.
+
+5. https://estabat.org/public/assets/img/campus-life-images/image3.png (276.26 Ko) - Image
+   -> Action recommandee : Optimiser la compression et utiliser le lazy loading.
+
+============================================================
+Genere par ZITRO CLI v1.0.0

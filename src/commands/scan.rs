@@ -2,13 +2,11 @@ use anyhow::Result;
 use colored::Colorize;
 use reqwest;
 use scraper::{Html, Selector};
-use std::fs;
-use std::path::Path;
 
 use crate::calculator::ecoindex;
 use crate::models::report::ScanResult;
 
-/// Exécute un scan complet sur une URL
+/// Exécute un scan complet sur une URL et affiche le résultat dans le terminal
 pub async fn execute(url: &str, country: Option<String>) -> Result<()> {
     println!("Connexion a {} ...", url);
 
@@ -87,7 +85,7 @@ pub async fn execute(url: &str, country: Option<String>) -> Result<()> {
     }
 
     println!("Ressources analysees : {}", nb_requests);
-    println!("Poids total : {:.2} Ko", total_size_bytes as f64 / 1024.0);
+    println!("Poids total estime : {:.2} Ko", total_size_bytes as f64 / 1024.0);
     println!();
 
     // 4. Calcul EcoIndex
@@ -100,15 +98,8 @@ pub async fn execute(url: &str, country: Option<String>) -> Result<()> {
         resources,
     );
 
-    // 5. Affichage des résultats dans le terminal
+    // 5. Affichage des résultats dans le terminal (Version simplifiée)
     display_results(&result);
-
-    // 6. Génération du rapport Texte (.txt)
-    let report_path = generate_text_report(&result)?;
-    println!();
-    println!("Rapport texte sauvegarde a l'emplacement :");
-    println!("> {}", report_path.green().bold());
-    println!("(Vous pouvez copier ce chemin pour ouvrir ou deplacer le fichier)");
 
     Ok(())
 }
@@ -136,10 +127,10 @@ fn resolve_url(base: &str, relative: &str) -> String {
     relative.to_string()
 }
 
-/// Affiche les résultats dans le terminal (avec couleurs)
+/// Affiche les résultats de manière sobre et directe dans le terminal
 fn display_results(result: &ScanResult) {
     println!("============================================================");
-    println!("  RESULTATS DE L'AUDIT");
+    println!("  RESULTATS DE L'AUDIT ZITRO");
     println!("============================================================");
     println!();
     println!("URL auditee      : {}", result.url);
@@ -170,71 +161,4 @@ fn display_results(result: &ScanResult) {
     }
     println!("                 {}", prod_msg);
     println!("============================================================");
-}
-
-/// Génère un rapport Texte (.txt) sobre et lisible
-fn generate_text_report(result: &ScanResult) -> Result<String> {
-    // Création du dossier zitro-reports s'il n'existe pas
-    let reports_dir = Path::new("zitro-reports");
-    if !reports_dir.exists() {
-        fs::create_dir_all(reports_dir)?;
-    }
-
-    // Nom de fichier sécurisé
-    let safe_filename = result.url
-        .replace("://", "_")
-        .replace('/', "_")
-        .replace(':', "_")
-        .replace('.', "_");
-    
-    let filename = format!("zitro-rapport-{}.txt", safe_filename);
-    let file_path = reports_dir.join(&filename);
-    let absolute_path = file_path.canonicalize()?.to_string_lossy().to_string();
-    
-    let (prod_msg, ready) = result.grade.production_message();
-    let prod_status = if ready { "AUTORISE" } else { "DECONSEILLE" };
-
-    let mut report = String::new();
-    report.push_str("============================================================\n");
-    report.push_str("        RAPPORT D'AUDIT ZITRO CLI\n");
-    report.push_str("============================================================\n\n");
-    
-    report.push_str(&format!("Date : {}\n", result.timestamp));
-    report.push_str(&format!("URL auditee : {}\n", result.url));
-    report.push_str(&format!("Mix energetique : {} gCO2eq/kWh\n", result.emission_factor));
-    if let Some(code) = &result.country {
-        report.push_str(&format!("Pays cible : {}\n\n", code.to_uppercase()));
-    } else {
-        report.push_str("Pays cible : International (moyenne mondiale)\n\n");
-    }
-
-    report.push_str("--- METRIQUES ---\n");
-    report.push_str(&format!("Poids total : {:.2} Ko\n", result.metrics.page_size_kb));
-    report.push_str(&format!("Nombre de requetes : {}\n", result.metrics.nb_requests));
-    report.push_str(&format!("Taille du DOM : {} noeuds\n", result.metrics.dom_size));
-    report.push_str(&format!("Carbone estime : {:.6} g CO2eq\n\n", result.metrics.estimated_carbon_g));
-
-    report.push_str("--- SCORE ECOINDEX ---\n");
-    report.push_str(&format!("Score : {:.2} / 100\n", result.ecoindex_score));
-    report.push_str(&format!("Note : {}\n", result.grade.label()));
-    report.push_str(&format!("Appreciation : {}\n\n", result.grade.message()));
-
-    report.push_str("--- DECISION DE MISE EN PRODUCTION ---\n");
-    report.push_str(&format!("Statut : {}\n", prod_status));
-    report.push_str(&format!("Message : {}\n\n", prod_msg));
-
-    if !result.heaviest_resources.is_empty() {
-        report.push_str("--- RESSOURCES LES PLUS IMPACTANTES ---\n");
-        for (i, res) in result.heaviest_resources.iter().enumerate() {
-            report.push_str(&format!("{}. {} ({:.2} Ko) - {}\n", 
-                i + 1, res.url, res.size_kb, res.resource_type));
-            report.push_str(&format!("   -> Action recommandee : {}\n\n", res.recommendation));
-        }
-    }
-
-    report.push_str("============================================================\n");
-    report.push_str("Genere par ZITRO CLI v1.0.0\n");
-
-    fs::write(&file_path, &report)?;
-    Ok(absolute_path)
 }

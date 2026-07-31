@@ -3,12 +3,15 @@ use crate::utils::country_data;
 use chrono::Local;
 
 /// Calcule le score EcoIndex (0 à 100)
-/// Formule simplifiée basée sur les 3 métriques officielles
+/// Formule ajustée avec des seuils plus réalistes
 pub fn calculate_ecoindex(page_size_kb: f64, nb_requests: usize, dom_size: usize) -> f64 {
-    // Normalisation des métriques (valeurs de référence EcoIndex)
-    let size_norm = (page_size_kb / 2000.0).min(1.0);
-    let req_norm = (nb_requests as f64 / 100.0).min(1.0);
-    let dom_norm = (dom_size as f64 / 1500.0).min(1.0);
+    // Normalisation avec des seuils plus réalistes
+    // Taille : 3000 Ko comme référence (au lieu de 2000)
+    let size_norm = (page_size_kb / 3000.0).min(1.0);
+    // Requêtes : 150 comme référence (au lieu de 100)
+    let req_norm = (nb_requests as f64 / 150.0).min(1.0);
+    // DOM : 2000 noeuds comme référence (au lieu de 1500)
+    let dom_norm = (dom_size as f64 / 2000.0).min(1.0);
 
     // Formule pondérée (taille 40%, requêtes 35%, DOM 25%)
     let weighted = (size_norm * 0.40) + (req_norm * 0.35) + (dom_norm * 0.25);
@@ -101,20 +104,18 @@ pub fn build_scan_result(
     let grade = Grade::from_score(ecoindex_score);
     let estimated_carbon = estimate_carbon(page_size_kb, emission_factor);
 
-    // CORRECTION 1 : On calcule production_ready AVANT de déplacer 'grade' dans la struct
     let production_ready = matches!(grade, Grade::A | Grade::B);
 
-    // Tri des ressources par taille décroissante pour trouver les plus lourdes
+    // Tri des ressources par taille décroissante
     let mut sorted_resources = resources;
     sorted_resources.sort_by(|a, b| b.1.partial_cmp(&a.1).unwrap());
 
     let heaviest_resources: Vec<ResourceInfo> = sorted_resources
         .into_iter()
-        .take(5) // Top 5 des ressources les plus lourdes
+        .take(5)
         .map(|(res_url, size_kb)| {
             let res_type = get_resource_type(&res_url);
             ResourceInfo {
-                // CORRECTION 2 : On clone res_url pour éviter le conflit d'emprunt
                 url: res_url.clone(),
                 size_kb,
                 resource_type: res_type.to_string(),
@@ -137,7 +138,7 @@ pub fn build_scan_result(
         },
         ecoindex_score,
         grade,
-        production_ready, // On utilise la variable pré-calculée
+        production_ready,
         heaviest_resources,
         timestamp,
     }
