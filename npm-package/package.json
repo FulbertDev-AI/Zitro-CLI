@@ -1,0 +1,18 @@
+{
+  "name": "zitro-cli",
+  "version": "1.0.0",
+  "description": "Carbon footprint auditor for web applications",
+  "bin": {
+    "zitro": "./install.js"
+  },
+  "scripts": {
+    "postinstall": "node install.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/FulbertDev-AI/zitro-cli.git"
+  },
+  "keywords": ["carbon", "ecoindex", "cli", "green-it", "sustainability"],
+  "author": "Fulbert D. NANGA",
+  "license": "MIT"
+}
