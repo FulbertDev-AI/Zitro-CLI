@@ -1,13 +1,11 @@
-#!/usr/bin/env node
-
 const https = require('https');
 const fs = require('fs');
 const path = require('path');
 const { execSync } = require('child_process');
 const os = require('os');
 
-const VERSION = 'v1.0.0';
-const GITHUB_REPO = 'FulbertDev-AI/zitro-cli';
+const VERSION = 'v1.0.1';
+const GITHUB_REPO = 'FulbertDev-AI/Zitro-CLI';
 
 function getPlatformInfo() {
   const platform = os.platform();
@@ -70,17 +68,4 @@ async function install() {
   }
 }
 
-// Si ce fichier est exécuté directement (postinstall)
-if (require.main === module) {
-  const binPath = path.join(__dirname, 'bin', `zitro${platform.ext}`);
-  if (fs.existsSync(binPath)) {
-    // Le binaire existe déjà, on l'exécute
-    const args = process.argv.slice(2);
-    execSync(`"${binPath}" ${args.join(' ')}`, { stdio: 'inherit' });
-  } else {
-    // Premier lancement, on installe
-    install();
-  }
-}
-
-module.exports = { install };
+install();
